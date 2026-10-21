@@ -58,9 +58,11 @@ class LLMJudgeEvaluator(BaseEvaluator):
                 from openai import OpenAI
             except ImportError:
                 raise RuntimeError(f"Provider '{self.provider}' needs: pip install 'agentic-eval[openai]'") from None
-            # Local OpenAI-compatible servers (e.g. ollama) accept any key.
-            api_key = os.environ.get("OPENAI_API_KEY", "not-needed")
-            self.client = OpenAI(base_url=self.config.llm_judge.custom_endpoint, api_key=api_key)
+            endpoint = self.config.llm_judge.custom_endpoint
+            # OPENAI_API_KEY only ever goes to OpenAI's own API: a config pointing at another host must not
+            # receive it. Custom endpoints get a key the user exported for that purpose; ollama needs none.
+            key_env = "AGENT_EVAL_JUDGE_API_KEY" if endpoint else "OPENAI_API_KEY"
+            self.client = OpenAI(base_url=endpoint, api_key=os.environ.get(key_env, "not-needed"))
         else:
             raise RuntimeError(f"Unknown llm_judge provider: {self.provider}")
 

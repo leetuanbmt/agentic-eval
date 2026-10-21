@@ -14,7 +14,7 @@ Check each answer against the real questions and their limits before submitting.
 | Contributors | 1 (maintainer) | git log |
 | License | MIT (added in 0.1.0, not yet pushed) | `LICENSE` |
 | Releases | None yet; 0.1.0 prepared | `CHANGELOG.md` |
-| Tests | 91 offline pytest tests incl. 3 Docker isolation tests; verified locally on Python 3.10, 3.14 (macOS) and 3.12 (Linux) | `tests/` |
+| Tests | 97 offline pytest tests incl. 3 Docker isolation tests; verified locally on Python 3.10, 3.14 (macOS) and 3.12 (Linux) | `tests/` |
 | CI | GitHub Actions workflow written; not yet run publicly | `.github/workflows/ci.yml` |
 
 There is no adoption yet. This application rests on the engineering problem and the maintenance plan,
@@ -79,7 +79,7 @@ Not for: any private, client or commercial workload, including the maintainer's 
 
 > I am the sole author and maintainer. For 0.1.0 I hardened command execution (removed shell interpolation,
 > added process-group timeouts, fixed path and symlink escapes), made the core offline with optional LLM
-> providers, and added 91 tests, CI and security/contribution policies. The project is new: no external users
+> providers, and added 97 tests, CI and security/contribution policies. The project is new: no external users
 > or contributors yet, which I am stating plainly.
 
 **3. How would you use Codex and API credits?** (361 chars)

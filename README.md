@@ -1,24 +1,40 @@
-# Agentic-Eval
+<h1 align="center">agentic-eval</h1>
 
-A small, offline-first CLI for evaluating AI coding agents and agentic workflows.
+<p align="center">
+  Offline-first CLI for evaluating AI coding agents.<br>
+  YAML test cases, deterministic checks, JSON/Markdown reports and a regression gate for CI.
+</p>
 
-You describe test cases in YAML, point `agent-eval` at your agent, and it runs each case in a fresh
+<p align="center">
+  <a href="https://github.com/leetuanbmt/agentic-eval/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/leetuanbmt/agentic-eval/actions/workflows/ci.yml/badge.svg"></a>
+  <img alt="python" src="https://img.shields.io/badge/python-3.10%2B-blue">
+  <img alt="license" src="https://img.shields.io/badge/license-MIT-blue">
+  <img alt="status" src="https://img.shields.io/badge/status-alpha-orange">
+</p>
+
+---
+
+Agent changes (a new prompt, model, tool or workflow file) are easy to make and hard to verify.
+
+You describe test cases in YAML and point `agent-eval` at your agent. It runs each case in a fresh
 workspace, scores the result with deterministic checks (and optionally an LLM judge), and writes
 JSON + Markdown reports with a CI-friendly exit code. Two reports can be diffed to catch regressions.
+Agentic-Eval evaluates agents; it does not orchestrate them.
 
-Agentic-Eval evaluates agents. It does not orchestrate them.
+> Status: alpha (0.1.0). The workflow below is implemented and tested; interfaces may still change.
 
-> Status: alpha (0.1.0). The core workflow below is implemented and tested; interfaces may still change.
+---
 
 ## Why
 
-Agent changes (a new prompt, model, tool or workflow file) are easy to make and hard to verify.
 Agentic-Eval gives you a repeatable answer to "did this change make the agent better or worse?":
 
 - the same dataset runs against any agent you can start from a command line;
 - deterministic evaluators give the same verdict every run, so CI gates are stable;
 - reports carry config and dataset hashes, so a result can be traced to exactly what produced it;
 - `agent-eval compare` turns two runs into a pass/fail regression gate.
+
+---
 
 ## Features
 
@@ -33,6 +49,8 @@ Agentic-Eval gives you a repeatable answer to "did this change make the agent be
 
 Not included: parallel execution, statistical benchmarking, a web UI, agent orchestration.
 
+---
+
 ## Installation
 
 Requires Python 3.10+.
@@ -44,6 +62,8 @@ pip install -e .                 # core, offline
 pip install -e '.[gemini]'       # optional: Gemini LLM judge
 pip install -e '.[openai]'       # optional: OpenAI-compatible LLM judge (OpenAI, ollama, ...)
 ```
+
+---
 
 ## Five-minute quickstart
 
@@ -82,6 +102,8 @@ Python code, checks it with a unit-test command, and shows a pass, a failure and
 agent-eval run --config examples/local-agent/eval-config.yaml \
   --dataset examples/local-agent/dataset --allow-exec
 ```
+
+---
 
 ## Configuration
 
@@ -142,6 +164,8 @@ An evaluator whose expectation is missing from a test case is reported as `SKIP`
 A case is `passed` only if the agent exits with the expected code and no applicable evaluator fails;
 otherwise it is `failed`, `error` (crash, bad exit code, path violation) or `timeout`.
 
+---
+
 ## Regression checks
 
 ```bash
@@ -153,6 +177,8 @@ agent-eval compare baseline.json current.json --score-tolerance 5
 `compare` exits 1 if a previously passing case no longer passes, a case disappeared, or an evaluator score
 dropped by more than the tolerance. It is a deterministic diff; it does not do statistics.
 
+---
+
 ## Using it in CI
 
 ```yaml
@@ -161,6 +187,8 @@ dropped by more than the tolerance. It is a deterministic diff; it does not do s
 ```
 
 The job fails on any non-passing case (exit 1) or invalid config/dataset (exit 2).
+
+---
 
 ## Offline execution and optional LLM evaluation
 
@@ -176,12 +204,18 @@ llm_judge:
   custom_endpoint: null             # base URL for OpenAI-compatible servers
 ```
 
+`OPENAI_API_KEY` is only sent to OpenAI's default endpoint. A `custom_endpoint` receives
+`AGENT_EVAL_JUDGE_API_KEY` instead (or no key, which is fine for ollama), so a shared config cannot
+redirect your OpenAI key to another host.
+
 LLM grading is nondeterministic: the same output can get different scores. Each result records
 `provider`, `model`, `temperature`, `nondeterministic: true`, and token `usage` when the provider returns it
 (otherwise `null`). Cost is not estimated. Prefer deterministic evaluators for CI gates.
 
 [`examples/gemini-agent`](examples/gemini-agent) shows a real LLM agent (Gemini function calling) under evaluation.
 It makes paid API calls.
+
+---
 
 ## Security model and limitations
 
@@ -194,8 +228,9 @@ Read this before evaluating an agent you do not trust.
 - **`runtime.mode: docker`** runs each command in a disposable container: `--network none`, `--cap-drop ALL`,
   `no-new-privileges`, memory and PID limits, only the workspace mounted read-write. This is a meaningful
   boundary but not a hardened one (shared kernel; your Docker daemon's configuration applies).
-- **No shell by default.** Commands run as argv. `agent.shell: true` opts into `/bin/sh -c` with every
-  substituted value shell-quoted.
+- **No shell by default.** Commands run as argv. `agent.shell: true` opts into `/bin/sh -c`; substituted
+  values are passed as positional parameters (`"$1"`), so they are never parsed as shell code.
+  Placeholders inside single quotes are rejected.
 - **Paths are contained.** `source_context`, evaluator `file:` and generated-file paths must stay inside their
   root after resolving symlinks; copied symlinks pointing outside the workspace are removed.
 - **Environment.** Child processes get `PATH`, `HOME`, locale and temp variables plus what you list in
@@ -209,6 +244,8 @@ Read this before evaluating an agent you do not trust.
 - Tested on macOS and Linux. Windows is untested.
 
 Report vulnerabilities as described in [SECURITY.md](SECURITY.md).
+
+---
 
 ## Migrating from the pre-release CLI
 
@@ -227,9 +264,31 @@ with these intentional changes:
 - the Gemini SDK moved from the deprecated `google-generativeai` to `google-genai`, now an optional extra;
 - the built-in Gemini simulator moved to `examples/gemini-agent/agent.py`.
 
+---
+
+## Testing
+
+```bash
+pip install -e '.[dev]'
+pytest -q
+```
+
+```console
+97 passed in 7.44s
+```
+
+The suite runs offline, blocks network access and provider SDK imports, and covers config validation,
+dataset loading, every evaluator, timeouts and process cleanup, report redaction, regression comparison,
+path/symlink escapes and shell-injection attempts. Three Docker isolation tests run when Docker and the
+`python:3.12-slim` image are available, and are skipped otherwise.
+
+---
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). In short: `pip install -e '.[dev]' && ruff check . && pytest`.
+
+---
 
 ## Roadmap
 
@@ -239,6 +298,8 @@ Candidates, in rough priority order; none are promised:
 2. Repeat runs per case (`--repeat N`) to surface flaky agents and LLM-judge variance.
 3. Parallel case execution.
 4. JUnit XML output for CI test panels.
+
+---
 
 ## License
 

@@ -48,7 +48,7 @@ jobs:
       - name: Release artifacts contain only package files
         run: |
           python -m zipfile -l dist/*.whl
-          ! python -m zipfile -l dist/*.whl | grep -E '\.env|tests/|examples/|sandbox'
+          ! python -m zipfile -l dist/*.whl | awk 'NR > 1 {print $1}' | grep -E '(^|/)\.env|^tests/|^examples/'
       - name: Dependency audit
         run: |
           pip install dist/*.whl

@@ -1,5 +1,6 @@
 import codecs
 import os
+import re
 import shlex
 import signal
 import subprocess
@@ -18,6 +19,7 @@ console = Console()
 
 # Variables every child process may see; anything else must be listed in agent.env.
 BASE_ENV = ("PATH", "HOME", "LANG", "LC_ALL", "TMPDIR", "TEMP", "TMP", "SYSTEMROOT", "PYTHONIOENCODING")
+PLACEHOLDER = re.compile(r"\{(\w+)\}")
 APPROVAL_PATTERNS = ("approve?", "do you want to proceed", "press enter to continue", "[y/n]", "approve the plan",
                      "xác nhận", "đồng ý")
 # Container-side paths used when runtime.mode is docker.
@@ -47,14 +49,44 @@ def render_command(template: Union[str, List[str]], variables: Dict[str, str], s
     """Renders a command template into argv. Values are substituted per token, never re-split."""
     try:
         if shell:
-            # The template's own quoting and operators are kept; only substituted values are quoted.
-            quoted = {k: shlex.quote(v) for k, v in variables.items()}
-            script = template if isinstance(template, str) else " ".join(template)
-            return ["/bin/sh", "-c", script.format(**quoted)]
+            return _render_shell(template if isinstance(template, str) else " ".join(template), variables)
         tokens = shlex.split(template) if isinstance(template, str) else list(template)
         return [t.format(**variables) for t in tokens]
     except KeyError as e:
         raise KeyError(f"Missing template variable {e} in command: {template}") from None
+
+
+def _render_shell(script: str, variables: Dict[str, str]) -> List[str]:
+    """Replaces each {name} with a positional parameter, so values are never parsed as shell code.
+
+    Unquoted placeholders become "$N" (one word); inside double quotes they become ${N}.
+    Placeholders inside single quotes are rejected because the shell would not expand them.
+    """
+    out, args, quote, i = [], [], None, 0
+    while i < len(script):
+        ch = script[i]
+        if script.startswith(("{{", "}}"), i):  # str.format-style escapes for literal braces
+            out.append(ch)
+            i += 2
+            continue
+        m = PLACEHOLDER.match(script, i) if ch == "{" else None
+        if m:
+            if quote == "'":
+                raise ValueError(f"Placeholder {m.group(0)} inside single quotes in shell command: {script}")
+            args.append(variables[m.group(1)])  # KeyError for unknown names, as in argv mode
+            ref = f"${{{len(args)}}}"
+            out.append(ref if quote == '"' else f'"{ref}"')
+            i = m.end()
+            continue
+        if ch == "\\" and quote != "'":
+            out.append(script[i:i + 2])
+            i += 2
+            continue
+        if ch in "'\"" and quote in (None, ch):
+            quote = None if quote else ch
+        out.append(ch)
+        i += 1
+    return ["/bin/sh", "-c", "".join(out), "sh", *args]
 
 
 def template_vars(test_case: TestCase) -> Dict[str, str]:

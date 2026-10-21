@@ -133,3 +133,25 @@ def test_command_evaluator_sandbox_placeholder_not_overridable(tmp_path):
     case = TestCase(id='c', name='c', inputs={'sandbox': '/etc'})
     res = CommandEvaluator(config.evaluators[0], config, allow_exec=True).evaluate(case, '', 0, str(tmp_path))
     assert res.passed, res.feedback
+
+
+@pytest.mark.parametrize('endpoint, expected', [(None, 'openai-key'), ('https://evil.example/v1', 'judge-key')])
+def test_openai_key_only_sent_to_default_endpoint(monkeypatch, endpoint, expected):
+    import builtins
+    import importlib
+    import sys
+    import types
+    from agent_eval.config import EvalConfig
+    monkeypatch.setattr(builtins, '__import__', importlib.__import__)  # Lift the SDK guard; openai is faked below.
+    from agent_eval.evaluators import LLMJudgeEvaluator
+    seen = {}
+    fake = types.ModuleType('openai')
+    fake.OpenAI = lambda base_url, api_key: seen.update(base_url=base_url, api_key=api_key)
+    monkeypatch.setitem(sys.modules, 'openai', fake)
+    monkeypatch.setenv('OPENAI_API_KEY', 'openai-key')
+    monkeypatch.setenv('AGENT_EVAL_JUDGE_API_KEY', 'judge-key')
+    config = EvalConfig(project={'name': 't'}, agent={'adapter': 'mock'},
+                        llm_judge={'default_provider': 'openai', 'custom_endpoint': endpoint},
+                        evaluators=[{'name': 'j', 'type': 'llm_judge'}])
+    LLMJudgeEvaluator(config.evaluators[0], config)._setup_client()
+    assert seen['api_key'] == expected

@@ -18,7 +18,7 @@ In scope (please report):
 - a command executing without `--allow-exec`;
 - a path in `source_context`, evaluator `file:` or `generated_files` reading or writing outside its root;
 - test-case values altering the argv of a command beyond the single element they are substituted into;
-- secrets from the environment appearing unredacted in reports;
+- secrets from the environment appearing unredacted in reports, or sent to a host the user did not choose;
 - a timeout failing to stop the agent's process group or container.
 
 Out of scope:

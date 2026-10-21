@@ -42,3 +42,6 @@ First public release.
   regardless of line length.
 - Streamed console output is redacted per line, so secrets split across reads are still caught;
   test-case inputs cannot override reserved command placeholders such as `{sandbox}`.
+- `shell: true` passes substituted values as positional parameters; quoting in the template can no longer
+  turn a value into shell code.
+- `OPENAI_API_KEY` is never sent to a `custom_endpoint`; use `AGENT_EVAL_JUDGE_API_KEY` there.

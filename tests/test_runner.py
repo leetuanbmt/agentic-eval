@@ -1,6 +1,5 @@
 import json
 import os
-import shlex
 import signal
 import sys
 import time
@@ -17,12 +16,23 @@ def test_render_argv_preserves_value(value):
     assert render_command(['program', '{value}'], {'value': value}, False) == ['program', value]
 
 
-def test_shell_substitutions_are_quoted():
+def test_shell_substitutions_are_positional_parameters():
     value = 'a; rm -rf x'
     argv = render_command(['printf', '%s', '{value}'], {'value': value}, True)
-    assert argv[:2] == ['/bin/sh', '-c']
-    assert argv[2] == f'printf %s {shlex.quote(value)}'
-    assert shlex.split(argv[2]) == ['printf', '%s', value]
+    assert argv == ['/bin/sh', '-c', 'printf %s "${1}"', 'sh', value]
+
+
+@pytest.mark.parametrize('template', ['echo {v}', 'echo "{v}"', 'echo "pre {v} post"'])
+def test_shell_values_never_execute(tmp_path, template):
+    argv = render_command(template, {'v': '$(touch pwned) `touch pwned2` "; touch pwned3'}, shell=True)
+    result = run_process(argv, str(tmp_path), build_env([]), timeout=5)
+    assert result.exit_code == 0 and '$(touch pwned)' in result.output
+    assert not list(tmp_path.glob('pwned*'))
+
+
+def test_shell_placeholder_in_single_quotes_rejected():
+    with pytest.raises(ValueError):
+        render_command("echo '{v}'", {'v': 'x'}, shell=True)
 
 
 def test_missing_template_variable():
