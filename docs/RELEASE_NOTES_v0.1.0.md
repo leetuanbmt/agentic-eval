@@ -1,4 +1,4 @@
-# agentic-eval 0.1.0 (draft)
+# agentic-eval 0.1.0
 
 First public release of a small, offline-first CLI for evaluating AI coding agents.
 
