@@ -1,0 +1,10 @@
+id: write-readme
+name: "Write a README section describing a CLI flag"
+inputs:
+  prompt: "Create docs/usage.md explaining that --verbose prints debug logs."
+  source_context:
+    - path: agent.py
+expected_outputs:
+  generated_files:
+    - path: docs/usage.md
+  invariants: ["usage.md"]

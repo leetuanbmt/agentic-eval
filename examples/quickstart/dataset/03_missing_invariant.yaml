@@ -1,0 +1,9 @@
+# Intentionally failing case: shows how a regression is reported.
+id: missing-invariant
+name: "Agent forgets to mention the safety verdict"
+category: output
+mock:
+  output: "Audit finished. Health score: 72"
+expected_outputs:
+  invariants: ["Health score", "Safety verdict"]
+evaluators: [invariants]

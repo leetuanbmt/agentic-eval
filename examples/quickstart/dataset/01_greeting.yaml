@@ -1,0 +1,9 @@
+id: greeting
+name: "Agent prints the expected greeting"
+category: output
+mock:
+  output: "Hello, world!"
+expected_outputs:
+  exact: "Hello, world!"
+  invariants: ["Hello"]
+evaluators: [invariants, exact]

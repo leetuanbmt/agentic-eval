@@ -1,0 +1,9 @@
+# Intentionally times out: the agent never finishes.
+id: hang
+name: "Agent hangs and is killed by the timeout"
+inputs:
+  task: hang
+  source_context:
+    - path: agent.py
+limits:
+  timeout_seconds: 2

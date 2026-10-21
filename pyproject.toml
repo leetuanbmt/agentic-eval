@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=77.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agentic-eval"
+version = "0.1.0"
+description = "Offline-first CLI for evaluating AI coding agents with YAML datasets, deterministic checks and CI-ready reports"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "leetuanbmt", email = "leetuanbmt@gmail.com" }]
+keywords = ["ai-agents", "evaluation", "llm", "testing", "ci"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    "click>=8.0.0",
+    "pydantic>=2.0.0",
+    "ruamel.yaml>=0.17.0",
+    "rich>=12.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+gemini = ["google-genai>=1.0.0"]
+openai = ["openai>=1.0.0"]
+dev = ["pytest>=7", "ruff>=0.6", "build>=1.0"]
+
+[project.urls]
+Homepage = "https://github.com/leetuanbmt/agentic-eval"
+Issues = "https://github.com/leetuanbmt/agentic-eval/issues"
+Changelog = "https://github.com/leetuanbmt/agentic-eval/blob/main/CHANGELOG.md"
+
+[project.scripts]
+agent-eval = "agent_eval.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["agent_eval*"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+# Pyflakes + pycodestyle errors only; pinned so local and CI results do not depend on user-level config.
+select = ["E", "F"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

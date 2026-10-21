@@ -1,0 +1,8 @@
+id: write-module
+name: "Agent writes a working add() function"
+inputs:
+  task: write-module
+  source_context:
+    - path: agent.py
+expected_outputs:
+  invariants: ["mathutils.py"]

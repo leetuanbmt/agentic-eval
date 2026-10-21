@@ -1,0 +1,13 @@
+id: structured-report
+name: "Agent writes a structured JSON report"
+category: structured-output
+mock:
+  output: "Wrote report.json"
+  files:
+    report.json: '{"status": "ok", "summary": {"files_changed": 2, "tests": "passing"}}'
+expected_outputs:
+  invariants: ["report.json"]
+  json:
+    status: ok
+    summary:
+      tests: passing

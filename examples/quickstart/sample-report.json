@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "tool": {
+    "name": "agentic-eval",
+    "version": "0.1.0"
+  },
+  "project": {
+    "name": "Quickstart (mock agent)",
+    "version": "0.1.0"
+  },
+  "started_at": "2026-10-21T05:18:48+00:00",
+  "duration_seconds": 0.004,
+  "environment": {
+    "python": "3.14.5",
+    "platform": "darwin"
+  },
+  "config": {
+    "path": "examples/quickstart/eval-config.yaml",
+    "sha256": "105fb28db4531b2158fbdad9f78a3184e5f735aea132c476f6a7a5a8d4df62bb",
+    "adapter": "mock",
+    "runtime": "local",
+    "evaluators": [
+      {
+        "name": "invariants",
+        "type": "contains"
+      },
+      {
+        "name": "exact",
+        "type": "exact_match"
+      },
+      {
+        "name": "report-json",
+        "type": "json"
+      }
+    ]
+  },
+  "summary": {
+    "total": 3,
+    "passed": 2,
+    "failed": 1,
+    "error": 0,
+    "timeout": 0
+  },
+  "cases": [
+    {
+      "id": "greeting",
+      "name": "Agent prints the expected greeting",
+      "category": "output",
+      "dataset_file": "examples/quickstart/dataset/01_greeting.yaml",
+      "dataset_sha256": "b9abd41ad852a19445072d43096a52ba888396c4ba67c277f02c056d31a06b09",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_seconds": 0.0,
+      "output_truncated": false,
+      "error": null,
+      "output_excerpt": "Hello, world!",
+      "evaluators": [
+        {
+          "type": "contains",
+          "evaluator_name": "invariants",
+          "score": 100.0,
+          "passed": true,
+          "feedback": "All invariants found.",
+          "skipped": false,
+          "metrics": {
+            "missing": []
+          }
+        },
+        {
+          "type": "exact_match",
+          "evaluator_name": "exact",
+          "score": 100.0,
+          "passed": true,
+          "feedback": "Output matches exactly.",
+          "skipped": false,
+          "metrics": {}
+        }
+      ]
+    },
+    {
+      "id": "structured-report",
+      "name": "Agent writes a structured JSON report",
+      "category": "structured-output",
+      "dataset_file": "examples/quickstart/dataset/02_structured_report.yaml",
+      "dataset_sha256": "dbb057dd49b9a4a185c8c92d95a01cfbefc3cbbc8cab9973c1516ee7cf7e1b8d",
+      "status": "passed",
+      "exit_code": 0,
+      "duration_seconds": 0.0,
+      "output_truncated": false,
+      "error": null,
+      "output_excerpt": "Wrote report.json",
+      "evaluators": [
+        {
+          "type": "contains",
+          "evaluator_name": "invariants",
+          "score": 100.0,
+          "passed": true,
+          "feedback": "All invariants found.",
+          "skipped": false,
+          "metrics": {
+            "missing": []
+          }
+        },
+        {
+          "type": "exact_match",
+          "evaluator_name": "exact",
+          "score": 0.0,
+          "passed": true,
+          "feedback": "Skipped: no expected_outputs.exact",
+          "skipped": true,
+          "metrics": {}
+        },
+        {
+          "type": "json",
+          "evaluator_name": "report-json",
+          "score": 100.0,
+          "passed": true,
+          "feedback": "JSON output matches expected fields.",
+          "skipped": false,
+          "metrics": {}
+        }
+      ]
+    },
+    {
+      "id": "missing-invariant",
+      "name": "Agent forgets to mention the safety verdict",
+      "category": "output",
+      "dataset_file": "examples/quickstart/dataset/03_missing_invariant.yaml",
+      "dataset_sha256": "7441195f5475aa8ebc3b17a389a344199f3ca3e6b8edcf4220e45a2c4c2680a2",
+      "status": "failed",
+      "exit_code": 0,
+      "duration_seconds": 0.0,
+      "output_truncated": false,
+      "error": null,
+      "output_excerpt": "Audit finished. Health score: 72",
+      "evaluators": [
+        {
+          "type": "contains",
+          "evaluator_name": "invariants",
+          "score": 50.0,
+          "passed": false,
+          "feedback": "Missing:\n- Safety verdict",
+          "skipped": false,
+          "metrics": {
+            "missing": [
+              "Safety verdict"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

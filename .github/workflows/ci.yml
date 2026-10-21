@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - run: ruff check .
+      - run: docker pull -q python:3.12-slim  # Enables the docker isolation tests.
+      - run: pytest -q
+      - name: Offline demo (expected to exit 1 with one failing case)
+        run: |
+          set +e
+          agent-eval run --config examples/quickstart/eval-config.yaml --dataset examples/quickstart/dataset \
+            --output-report /tmp/report.md --output-json /tmp/report.json
+          test $? -eq 1
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install build pip-audit
+      - run: python -m build
+      - name: Release artifacts contain only package files
+        run: |
+          python -m zipfile -l dist/*.whl
+          ! python -m zipfile -l dist/*.whl | grep -E '\.env|tests/|examples/|sandbox'
+      - name: Dependency audit
+        run: |
+          pip install dist/*.whl
+          pip-audit

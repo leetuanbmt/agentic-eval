@@ -1,0 +1,25 @@
+# Live LLM example. Makes paid Gemini API calls; needs GEMINI_API_KEY and the gemini extra:
+#   pip install 'agentic-eval[gemini]'
+#   agent-eval run --config examples/gemini-agent/eval-config.yaml \
+#     --dataset examples/gemini-agent/dataset --allow-exec
+project:
+  name: "Gemini function-calling agent"
+  version: "0.1.0"
+
+agent:
+  adapter: command
+  command: ["{python}", "-u", "agent.py", "--test-case", "{test_case_path}", "--sandbox", "{sandbox}"]
+  env: [GEMINI_API_KEY, GOOGLE_API_KEY]  # Only listed secrets reach the agent process.
+  timeout_seconds: 300
+
+llm_judge:
+  default_provider: google
+  default_model: "gemini-3.1-flash-lite"
+  temperature: 0.0
+
+evaluators:
+  - name: "invariants"
+    type: contains
+  - name: "llm-fidelity"
+    type: llm_judge
+    threshold: 80

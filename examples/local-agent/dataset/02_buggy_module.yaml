@@ -1,0 +1,9 @@
+# Intentionally failing: the agent's code does not pass the unit test.
+id: buggy-module
+name: "Agent writes a broken add() function"
+inputs:
+  task: buggy-module
+  source_context:
+    - path: agent.py
+expected_outputs:
+  invariants: ["mathutils.py"]

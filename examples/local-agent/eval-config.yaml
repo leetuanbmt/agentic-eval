@@ -1,0 +1,25 @@
+# Runs a real local process. Commands only execute with --allow-exec:
+#   agent-eval run --config examples/local-agent/eval-config.yaml \
+#     --dataset examples/local-agent/dataset --allow-exec
+project:
+  name: "Local command agent"
+  version: "0.1.0"
+  root: "."  # source_context paths below resolve relative to this config file
+
+agent:
+  adapter: command
+  # argv list: no shell is involved, so test-case values cannot inject extra commands.
+  command: ["{python}", "agent.py", "--task", "{task}", "--workspace", "{sandbox}"]
+  timeout_seconds: 30
+
+# For untrusted agents, run every command in a throwaway container instead:
+# runtime:
+#   mode: docker
+#   docker_image: "python:3.12-slim"
+
+evaluators:
+  - name: "unit-test"
+    type: command
+    command: ["{python}", "-c", "import mathutils; assert mathutils.add(2, 3) == 5, 'add(2, 3) != 5'"]
+  - name: "mentions-file"
+    type: contains

@@ -1,0 +1,18 @@
+# Offline demo: the mock adapter replays canned agent output from each test case.
+# No API keys, no external commands. Run from the repository root:
+#   agent-eval run --config examples/quickstart/eval-config.yaml --dataset examples/quickstart/dataset
+project:
+  name: "Quickstart (mock agent)"
+  version: "0.1.0"
+
+agent:
+  adapter: mock
+
+evaluators:
+  - name: "invariants"
+    type: contains
+  - name: "exact"
+    type: exact_match
+  - name: "report-json"
+    type: json
+    file: "report.json"
