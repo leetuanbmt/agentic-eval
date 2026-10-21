@@ -9,13 +9,13 @@ Check each answer against the real questions and their limits before submitting.
 | Item | Value | Source |
 | --- | --- | --- |
 | Repository | https://github.com/leetuanbmt/agentic-eval | GitHub |
-| Visibility | Public since 2026-06-02 | `gh repo view` |
+| Visibility | Public; recreated with clean history on 2026-10-21 | `gh repo view` |
 | Stars / forks | 0 / 0 | `gh repo view` |
 | Contributors | 1 (maintainer) | git log |
-| License | MIT (added in 0.1.0, not yet pushed) | `LICENSE` |
+| License | MIT | `LICENSE` |
 | Releases | None yet; 0.1.0 prepared | `CHANGELOG.md` |
 | Tests | 97 offline pytest tests incl. 3 Docker isolation tests; verified locally on Python 3.10, 3.14 (macOS) and 3.12 (Linux) | `tests/` |
-| CI | GitHub Actions workflow written; not yet run publicly | `.github/workflows/ci.yml` |
+| CI | Passing on Python 3.10 and 3.13: ruff, 97 tests incl. Docker isolation, build, pip-audit | GitHub Actions run 39550365153 |
 
 There is no adoption yet. This application rests on the engineering problem and the maintenance plan,
 not on usage numbers.
@@ -63,7 +63,7 @@ Not for: any private, client or commercial workload, including the maintainer's 
 ## Current limitations and open blockers
 
 - No users, stars or external contributors yet.
-- First public CI run and the 0.1.0 tag are pending maintainer approval to push.
+- The v0.1.0 tag and release are not created yet.
 - Local runtime is not a sandbox; Docker isolation is basic. Windows is untested.
 
 ## Draft answers (English, each ≤ 500 characters)
