@@ -62,9 +62,11 @@ def test_timeout_kills_grandchild(tmp_path):
             except ProcessLookupError:
                 break
             # Linux init may retain a terminated orphan as a zombie before reaping it.
-            stat_file = Path(f'/proc/{pid}/stat')
-            if stat_file.exists() and stat_file.read_text().rsplit(')', 1)[1].split()[0] == 'Z':
-                break
+            try:
+                if Path(f'/proc/{pid}/stat').read_text().rsplit(')', 1)[1].split()[0] == 'Z':
+                    break
+            except FileNotFoundError:  # No /proc (macOS), or reaped since kill(0): re-check on the next poll.
+                pass
             if time.monotonic() >= deadline:
                 pytest.fail(f'Grandchild {pid} survived process-group timeout')
             time.sleep(0.05)

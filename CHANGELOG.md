@@ -2,6 +2,13 @@
 
 All notable changes are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Fixed
+- Docs: state that config/dataset files select local files and the `llm_judge` endpoint, and that
+  `--allow-exec` does not restrict data egress.
+- Flaky process-group timeout test on Linux.
+
 ## [0.1.0] - 2026-10-21
 
 First public release.

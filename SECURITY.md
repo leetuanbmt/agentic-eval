@@ -12,7 +12,9 @@ Include a minimal config/dataset that reproduces the issue. You should get a res
 
 ## Threat model
 
-Agentic-Eval runs agents and commands defined in config and dataset files. Treat those files as code.
+Agentic-Eval runs agents and commands defined in config and dataset files. Treat those files as code: they
+decide which local files are copied (`project.root`) and where `llm_judge` sends data (`custom_endpoint`).
+`--allow-exec` gates command execution only; it does not restrict network egress or file selection.
 
 In scope (please report):
 - a command executing without `--allow-exec`;
@@ -22,6 +24,7 @@ In scope (please report):
 - a timeout failing to stop the agent's process group or container.
 
 Out of scope:
+- files a config deliberately selects via `project.root` being sent to the `llm_judge` endpoint it configures;
 - anything an agent does in `runtime.mode: local` with your user's permissions — local mode is not a sandbox;
 - container escapes caused by the Docker daemon or kernel;
 - prompt injection of the optional LLM judge.

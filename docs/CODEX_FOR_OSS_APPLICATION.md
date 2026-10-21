@@ -55,36 +55,38 @@ environment is minimal, and an opt-in Docker runtime disables networking.
 
 Only for this open-source project:
 - CI-adjacent maintenance runs: Codex-assisted test generation and PR review on this repository;
-- running the published example evaluations (`examples/gemini-agent`, an OpenAI-backed `llm_judge`
-  example) to validate the optional LLM evaluators before releases.
+- live validation of the optional LLM paths before releases (`examples/gemini-agent`, and the Gemini and
+  OpenAI-compatible `llm_judge` providers), which so far are only tested offline.
 
 Not for: any private, client or commercial workload, including the maintainer's employer or other products.
 
 ## Current limitations and open blockers
 
 - No users, stars or external contributors yet.
-- The v0.1.0 tag and release are not created yet.
+- v0.1.0 is tagged; no GitHub Release or PyPI package yet.
+- The optional Gemini/OpenAI code paths have not been run against live APIs.
 - Local runtime is not a sandbox; Docker isolation is basic. Windows is untested.
 
-## Draft answers (English, each ≤ 500 characters)
+## Draft answers (English, each under 500 characters)
 
-**1. What does your project do and why does it matter?** (441 chars)
+**1. What does your project do and why does it matter?** (452 chars)
 
 > Agentic-Eval is a small, vendor-neutral CLI for evaluating AI coding agents. Developers write YAML test cases,
-> run any agent from a command, and get deterministic scores, JSON/Markdown reports and a regression gate for CI.
-> It treats agents as untrusted: no command runs without opt-in, paths are contained, secrets are redacted and a
-> Docker runtime disables networking. It answers "did this prompt/model change make my agent worse?" offline.
+> run any agent from a command (or a mock, offline), and get deterministic scores, JSON/Markdown reports and a
+> compare command that gates regressions in CI. No command runs without explicit opt-in; paths are contained,
+> secrets redacted, and a Docker runtime disables networking. It answers: did this prompt or model change make
+> my agent worse?
 
-**2. What is your role and how do you maintain it?** (365 chars)
+**2. What is your role and how do you maintain it?** (377 chars)
 
-> I am the sole author and maintainer. For 0.1.0 I hardened command execution (removed shell interpolation,
-> added process-group timeouts, fixed path and symlink escapes), made the core offline with optional LLM
-> providers, and added 97 tests, CI and security/contribution policies. The project is new: no external users
-> or contributors yet, which I am stating plainly.
+> I am the sole author and maintainer. v0.1.0 (October 2026) hardened command execution (no shell
+> interpolation, process-group timeouts, path and symlink containment), made the core offline with optional
+> LLM providers, and added 97 tests, CI on Python 3.10 and 3.13, and security and contribution policies. The
+> project is new: it has no external users, stars or contributors yet.
 
-**3. How would you use Codex and API credits?** (361 chars)
+**3. How would you use Codex and API credits?** (420 chars)
 
-> Codex: drafting tests and reviewing PRs on the security-sensitive runner and sandbox code, and building the
-> roadmap (Codex CLI and Claude Code adapters, repeat runs to measure flakiness, JUnit output). Credits: only for
-> this repository's maintenance and for validating its public example evaluations before releases. None for
-> private, client or commercial work.
+> Codex: drafting tests and reviewing changes to the security-sensitive runner and sandbox code (Codex drafted
+> the 0.1.0 test suite; I reviewed and corrected it), plus roadmap work such as Codex CLI and Claude Code
+> adapters and repeat runs to measure flakiness. Credits: only for this repository, including live validation
+> of the optional Gemini and OpenAI judge paths before releases. None for private or commercial work.

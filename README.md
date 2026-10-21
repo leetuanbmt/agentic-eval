@@ -221,6 +221,10 @@ It makes paid API calls.
 
 Read this before evaluating an agent you do not trust.
 
+- **Config and dataset files are code.** They choose which local files are copied into the workspace
+  (`project.root` + `source_context`, which may point anywhere) and where `llm_judge` sends output and
+  generated files (`custom_endpoint`). `--allow-exec` gates execution, not data leaving your machine.
+  Only run configs and datasets you trust.
 - **Nothing executes without `--allow-exec`.** Configs and datasets that use the `command` adapter or `command`
   evaluators fail with exit code 2 unless you pass the flag.
 - **`runtime.mode: local` is not a sandbox.** The agent runs as your user, in a temp directory, with a reduced
@@ -231,8 +235,8 @@ Read this before evaluating an agent you do not trust.
 - **No shell by default.** Commands run as argv. `agent.shell: true` opts into `/bin/sh -c`; substituted
   values are passed as positional parameters (`"$1"`), so they are never parsed as shell code.
   Placeholders inside single quotes are rejected.
-- **Paths are contained.** `source_context`, evaluator `file:` and generated-file paths must stay inside their
-  root after resolving symlinks; copied symlinks pointing outside the workspace are removed.
+- **Paths are contained** relative to the roots the config sets. `source_context`, evaluator `file:` and
+  generated-file paths must stay inside their root after resolving symlinks; copied symlinks pointing outside the workspace are removed.
 - **Environment.** Child processes get `PATH`, `HOME`, locale and temp variables plus what you list in
   `agent.env`. `.env` in the working directory is loaded into agent-eval's own environment.
 - **Secrets in reports.** Values of env vars whose names contain `KEY`, `TOKEN`, `SECRET`, `PASSW`,
